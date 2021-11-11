@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnjumsBookStore.Models\AnjumsBookStore.Models.csproj" />
     <ProjectReference Include="..\AnjumsBookStore.Utility\AnjumsBookStore.Utility.csproj" />
   </ItemGroup>
 
