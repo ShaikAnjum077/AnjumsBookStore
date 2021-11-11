@@ -61,5 +61,27 @@ project-Add-Project-Reference-.DataAccess and .Models
 Modify the _ViewStart.cshtml to refelect the new path
 Now Run the application
 
+8Nov 11AM--> Create the DataBase, Review appsettings.json
+
+12AM--> Create the migrations using Code first where are cchanges are pushed to the database, modify the database name and save.
+
+1PM==> Use the Nuget Package Manager Console to add the migration  as "add-migration AddDefaultIdentityMigration"
+If the wrong project is selected it gives and error so make sure to select the right one which is AnjumsBookStore and run again
+2PM-> Once the review of file and migration is completed --> the database needs ro be updated. 
+In the console update the database now.
+
+9th Nov 10AM: Review the Updated SQL Server Object Explorer review the errors and try ti resolve it.
+
+9th Nov 12AM -> Add a new table to the database by creating a Category model and push it to the DB. 
+
+1PM:- add a new class to the .Models project and model
+
+Add the migration via the PM console
+
+2PM->add-migration add CategoryToDb
+
+
+
+
 
  
