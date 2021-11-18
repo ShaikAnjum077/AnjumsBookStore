@@ -33,10 +33,11 @@ namespace AnjumsBooksStore
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
-
+            
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
                 services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddControllersWithViews();
         }
 

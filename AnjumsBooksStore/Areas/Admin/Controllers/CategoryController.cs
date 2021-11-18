@@ -14,13 +14,23 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryController(IUnitOfWork unitOfWork, ApplicationDbContext db)
+        public CategoryController(IUnitOfWork unitOfWork, ApplicationDbContext db, ICategoryRepository categoryRepository)
         {
             _unitOfWork = unitOfWork;
             _db = db;
+            _categoryRepository = categoryRepository;
         }
 
+
+        [HttpGet]
+        public IActionResult AddCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
         public IActionResult AddCategory(Category category)
         {
             if (ModelState.IsValid)
@@ -31,6 +41,35 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
             else
                 return View(category);
             
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpGet]
+        public IActionResult Upsert(int id)
+        {
+            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
+            return View(objFromDb);
+        }
+
+
+        [HttpPost]
+        public IActionResult Upsert(Category category)
+        {
+            if (ModelState.IsValid)
+                _categoryRepository.Update(category);
+            else
+                return View(category);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
+            _db.Categories.Remove(objFromDb);
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
 
