@@ -1,19 +1,11 @@
-# AnjumsBooksStore
-
-
-Name: Anjum ASP .net : Assignment 2
-
-01/11/2021 - 4:30pm 1.Created project named AnjumsBooksStoretore in ASP .net core web application MVC Opened startup file removed parameter in AddDefaultIdentity Pushed the project on Git I reviewed the ppt and follow the steps of projects I read the instruction and about each file I add the links in bootstrap file 01/11/2021 - 6:45pm finish for today
-
-03/11/2021 - 9:30am replace the *existing site.css  I changed the name of bootsrap file from bootsrap.min to bootsrap.css I changed the nav bar color tested the project and it was successful added dropdown and it is working I added three things in the projects
-
-    AnjumsBooksStore.DataAccess
-    AnjumsBooksStore.Models
-    AnjumsBooksStore.Utility Moved data folder to AnjumsBooksStore.DataAccess and delete original one 11:17pm finish for today
-
-17/11/2021 - 
-			
-			Added migrations for Category model
-			Added dependency injection for ICategoryRepository
-			Implemented CURD operations for Category.
+name: Anjum ASP .net : undertaking 2
+3rdNovember 6:30PM 1.Created task named AnjumsBooksStoretore in ASP .net core web software MVC Opened startup document eliminated parameter in AddDefaultIdentity pushed the mission on Git I reviewed the ppt and observe the steps of projects I examine the practise and approximately each file I add the hyperlinks in bootstrap record same day - 7:00pm.
+4thNovemeber 10:AM replace the *current web site.css I modified the call of bootsrap document from bootsrap.min to bootsrap.css I modified the nav bar colour examined the mission and it was successful added dropdown and it's miles running I delivered 3 matters within the tasks
+AnjumsBooksStore.DataAccess
+AnjumsBooksStore.fashions
+AnjumsBooksStore.application Moved data folder to AnjumsBooksStore.DataAccess and delete authentic
+19th November 1:00 PM
+Added migrations for class model
+Added dependency injection for ICategoryRepository
+applied CURD operations for class.
 			
