@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace AnjumsBooksStore.DataAccess.Repository.IRepository
 {
-    interface ICoverTypeRepository : IRepository<CoverType>
+    public interface ICoverTypeRepository : IRepository<CoverType>
     {
-        void Update(CoverType category);
+        void Update(CoverType coverType);
     }
 }

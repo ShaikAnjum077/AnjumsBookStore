@@ -38,6 +38,7 @@ namespace AnjumsBooksStore
                 .AddEntityFrameworkStores<ApplicationDbContext>();
                 services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICoverTypeRepository, CoverTypeRepository>();
             services.AddControllersWithViews();
         }
 

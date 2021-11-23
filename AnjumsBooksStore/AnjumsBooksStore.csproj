@@ -29,8 +29,4 @@
     <ProjectReference Include="..\AnjumsBooksStore.Utility\AnjumsBooksStore.Utility.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Admin\Controllers\" />
-  </ItemGroup>
-
 </Project>
