@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace AnjumsBooksStore.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CoverTypeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -47,7 +48,7 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Upsert(int id)
         {
-            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
+            var objFromDb = _db.CoverType.FirstOrDefault(s => s.Id == id);
             return View(objFromDb);
         }
 
@@ -66,8 +67,8 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
-            _db.Categories.Remove(objFromDb);
+            var objFromDb = _db.CoverType.FirstOrDefault(s => s.Id == id);
+            _db.CoverType.Remove(objFromDb);
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
