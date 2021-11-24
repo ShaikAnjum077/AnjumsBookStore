@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace AnjumsBooksStore.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -38,6 +39,18 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
             return View(productVM);
         }
 
+        #region API CALLS
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var allObj = _productRepository.GetProducts();
+            return Json(new { data = allObj });
+        }
+
+        #endregion
+
+        #region Non-Action methods
 
         [NonAction]
         private IEnumerable<SelectListItem> GetSelectListItemsCategories(IEnumerable<Models.Category> elements)
@@ -68,5 +81,8 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
             }
             return selectList;
         }
+
+        #endregion
+
     }
 }
