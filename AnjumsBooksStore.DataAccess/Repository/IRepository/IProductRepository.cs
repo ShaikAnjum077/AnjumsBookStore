@@ -1,4 +1,5 @@
 ﻿using AnjumsBooksStore.Models;
+using AnjumsBooksStore.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace AnjumsBooksStore.DataAccess.Repository.IRepository
     public interface IProductRepository : IRepository<Product>
     {
         void Update(Product product);
+
+        IEnumerable<ProductVM> GetProducts(); 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AnjumsBooksStore.DataAccess.Data;
 using AnjumsBooksStore.DataAccess.Repository.IRepository;
 using AnjumsBooksStore.Models;
+using AnjumsBooksStore.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,28 @@ namespace AnjumsBooksStore.DataAccess.Repository
                 objFromDb.CoverTypeId = product.CoverTypeId;
                 _db.SaveChanges();
             }
+        }
+
+        public IEnumerable<ProductVM> GetProducts()
+        {
+            var products = _db.Products.ToList();
+            var categories = _db.Categories.ToList();
+            var coverTypes = _db.CoverType.ToList();
+            List<ProductVM> productVMs = new List<ProductVM>();
+            ProductVM productVM = null;
+            foreach(var item in products)
+            {
+                productVM = new ProductVM();
+                productVM.Id = item.Id;
+                productVM.Title = item.Title;
+                productVM.LastPrice = item.LastPrice;
+                productVM.ISBN = item.ISBN;
+                productVM.CategoryName = categories.Where(i => i.Id == item.CategoryId).Select(i => i.Name).FirstOrDefault();
+                productVM.CoverTypeName = coverTypes.Where(i => i.Id == item.CoverTypeId).Select(i => i.Name).FirstOrDefault();
+
+                productVMs.Add(productVM);
+            }
+            return productVMs;
         }
     }
 }
