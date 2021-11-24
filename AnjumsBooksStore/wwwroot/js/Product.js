@@ -11,12 +11,11 @@ function loadDataTable() {
             "url": "/Admin/Product/GetAll"
         },
         "columns": [
-            { "data": "name"},
-            { "data": "title"},
+            { "data": "title" },
+            { "data": "isbn" },
+            { "data": "lastPrice" },
             { "data": "author"},
-            { "data": "lastprice"},
-            { "data": "categoryname"},
-            { "data": "covertypename"},
+            { "data": "categoryName"},
             {
                 "data": "id",
                 "render": function (data) {
@@ -30,7 +29,7 @@ function loadDataTable() {
                                 </a>
                             </div>
                             `;
-                }, "width": "40%"
+                }, "width": "20%"
             }
         ]
     });

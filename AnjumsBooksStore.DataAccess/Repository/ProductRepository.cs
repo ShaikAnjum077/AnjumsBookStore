@@ -38,6 +38,7 @@ namespace AnjumsBooksStore.DataAccess.Repository
                 objFromDb.Author = product.Author;
                 objFromDb.LastPrice = product.LastPrice;
                 objFromDb.CategoryId = product.CategoryId;
+                objFromDb.ImageUrl = product.ImageUrl;
                 objFromDb.CoverTypeId = product.CoverTypeId;
                 _db.SaveChanges();
             }
@@ -57,6 +58,7 @@ namespace AnjumsBooksStore.DataAccess.Repository
                 productVM.Title = item.Title;
                 productVM.LastPrice = item.LastPrice;
                 productVM.ISBN = item.ISBN;
+                productVM.Author = item.Author;
                 productVM.CategoryName = categories.Where(i => i.Id == item.CategoryId).Select(i => i.Name).FirstOrDefault();
                 productVM.CoverTypeName = coverTypes.Where(i => i.Id == item.CoverTypeId).Select(i => i.Name).FirstOrDefault();
 
