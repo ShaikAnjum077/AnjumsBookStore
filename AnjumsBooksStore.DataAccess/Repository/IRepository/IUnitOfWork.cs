@@ -10,6 +10,7 @@ namespace AnjumsBooksStore.DataAccess.Repository.IRepository
     {
         ICategoryRepository Category { get; }
         ICoverTypeRepository CoverType { get; }
+        IProductRepository Products { get; }
         ISP_Call SP_Call { get; }
     }
 }
