@@ -11,7 +11,5 @@ namespace AnjumsBooksStore.DataAccess.Repository.IRepository
     public interface IProductRepository : IRepository<Product>
     {
         void Update(Product product);
-
-        IEnumerable<ProductVM> GetProducts(); 
     }
 }

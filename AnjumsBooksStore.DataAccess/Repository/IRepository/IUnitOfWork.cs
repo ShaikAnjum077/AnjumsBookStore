@@ -12,5 +12,6 @@ namespace AnjumsBooksStore.DataAccess.Repository.IRepository
         ICoverTypeRepository CoverType { get; }
         IProductRepository Products { get; }
         ISP_Call SP_Call { get; }
+        void Save();
     }
 }

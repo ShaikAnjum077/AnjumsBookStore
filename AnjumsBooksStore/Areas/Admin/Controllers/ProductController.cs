@@ -2,10 +2,12 @@
 using AnjumsBooksStore.DataAccess.Repository.IRepository;
 using AnjumsBooksStore.Models;
 using AnjumsBooksStore.Models.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,118 +19,140 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
         private readonly IProductRepository _productRepository;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork, ApplicationDbContext db, IProductRepository productRepository)
+        public ProductController(IUnitOfWork unitOfWork, ApplicationDbContext db, IProductRepository productRepository, IWebHostEnvironment hostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _db = db;
             _productRepository = productRepository;
+            _hostEnvironment = hostEnvironment;
         }
 
         public IActionResult Index()
         {
             return View();
         }
-        
 
-        [HttpGet]
-        public IActionResult CreateProduct()
+
+        public IActionResult Upsert(int? id)
         {
-            var productVM = new ProductVM();
-            productVM.Categories = GetSelectListItemsCategories(_unitOfWork.Category.GetAll());
-            productVM.CoverTypes = GetSelectListItemsCoverTypes(_unitOfWork.CoverType.GetAll());
+            ProductVM productVM = new ProductVM()
+            {
+                Product = new Product(),
+                CategoryList = _unitOfWork.Category.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                }),
+                CoverTypeList = _unitOfWork.CoverType.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                })
+            };
+            if (id == null)
+            {
+                // this is for create
+                return View(productVM);
+            }
+            // this is for edit
+            productVM.Product = _unitOfWork.Products.Get(id.GetValueOrDefault());
+            if (productVM.Product == null)
+            {
+                return NotFound();
+            }
             return View(productVM);
         }
 
         [HttpPost]
-        public IActionResult CreateProduct(ProductVM productVM)
-        {
-            if (ModelState.IsValid)
-            {
-                var dbProduct = new Product();
-                dbProduct.Title = productVM.Title;
-                dbProduct.LastPrice = productVM.LastPrice;
-                dbProduct.ISBN = productVM.ISBN;
-                dbProduct.Description = productVM.Description;
-                dbProduct.CategoryId = productVM.CategoryId;
-                dbProduct.CoverTypeId = productVM.CoverTypeId;
-                dbProduct.Author = productVM.Author;
-                dbProduct.ImageUrl = productVM.ImageUrl;
-                _db.Products.Add(dbProduct);
-                _db.SaveChanges();
-            }
-            else
-            {
-                productVM.Categories = GetSelectListItemsCategories(_unitOfWork.Category.GetAll());
-                productVM.CoverTypes = GetSelectListItemsCoverTypes(_unitOfWork.CoverType.GetAll());
-                return View(productVM);
-            }                
-
-            return RedirectToAction("Index");
-
-        }
-
-        [HttpGet]
-        public IActionResult Upsert(int id)
-        {
-            var objFromDb = _db.Products.FirstOrDefault(s => s.Id == id);
-            if (objFromDb != null)
-            {
-                ProductVM productVM = new ProductVM();
-                productVM.Title = objFromDb.Title;
-                productVM.LastPrice = objFromDb.LastPrice;
-                productVM.ISBN = objFromDb.ISBN;
-                productVM.Description = objFromDb.Description;
-                productVM.CategoryId = objFromDb.CategoryId;
-                productVM.CoverTypeId = objFromDb.CoverTypeId;
-                productVM.Author = objFromDb.Author;
-                productVM.Id = objFromDb.Id;
-                productVM.ImageUrl = objFromDb.ImageUrl;
-                productVM.Categories = GetSelectListItemsCategories(_unitOfWork.Category.GetAll());
-                productVM.CoverTypes = GetSelectListItemsCoverTypes(_unitOfWork.CoverType.GetAll());
-                return View(productVM);
-            }
-            else
-                return RedirectToAction("Index");
-        }
-
-
-        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Upsert(ProductVM productVM)
         {
             if (ModelState.IsValid)
             {
-                var dbProduct = new Product();
-                dbProduct.Title = productVM.Title;
-                dbProduct.LastPrice = productVM.LastPrice;
-                dbProduct.ISBN = productVM.ISBN;
-                dbProduct.Description = productVM.Description;
-                dbProduct.CategoryId = productVM.CategoryId;
-                dbProduct.CoverTypeId = productVM.CoverTypeId;
-                dbProduct.Author = productVM.Author;
-                dbProduct.Id = productVM.Id;
-                dbProduct.ImageUrl = productVM.ImageUrl;
-                _productRepository.Update(dbProduct);
-            }   
+                string webRootPath = _hostEnvironment.WebRootPath;
+                var files = HttpContext.Request.Form.Files;
+                if (files.Count > 0)
+                {
+                    string fileName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(webRootPath, @"images\products");
+                    var extension = Path.GetExtension(files[0].FileName);
+
+                    if (productVM.Product.ImageUrl != null)
+                    {
+                        // this is an edit and we need to remove old image
+                        var imagePath = Path.Combine(webRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
+                    }
+                    using (var filesStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
+                    {
+                        files[0].CopyTo(filesStreams);
+                    }
+                    productVM.Product.ImageUrl = @"\images\products\" + fileName + extension;
+                }
+                else
+                {
+                    // update when they do not change the image
+                    if (productVM.Product.Id != 0)
+                    {
+                        Product objFromDb = _unitOfWork.Products.Get(productVM.Product.Id);
+                        productVM.Product.ImageUrl = objFromDb.ImageUrl;
+                    }
+                }
+
+                if (productVM.Product.Id == 0)
+                {
+                    _unitOfWork.Products.Add(productVM.Product);
+                }
+                else
+                {
+                    _unitOfWork.Products.Update(productVM.Product);
+                }
+                _unitOfWork.Save();
+                return RedirectToAction(nameof(Index));
+            }
             else
             {
-                productVM.Categories = GetSelectListItemsCategories(_unitOfWork.Category.GetAll());
-                productVM.CoverTypes = GetSelectListItemsCoverTypes(_unitOfWork.CoverType.GetAll());
-                return View(productVM);
+                productVM.CategoryList = _unitOfWork.Category.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                });
+                productVM.CoverTypeList = _unitOfWork.CoverType.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                });
+                if (productVM.Product.Id != 0)
+                {
+                    productVM.Product = _unitOfWork.Products.Get(productVM.Product.Id);
+                }
             }
-                
-
-            return RedirectToAction("Index");
+            return View(productVM);
         }
 
 
-        [HttpGet]
+        [HttpDelete]
         public IActionResult Delete(int id)
         {
-            var objFromDb = _db.Products.FirstOrDefault(s => s.Id == id);
-            _db.Products.Remove(objFromDb);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+            var objFromDb = _unitOfWork.Products.Get(id);
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            string webRootPath = _hostEnvironment.WebRootPath;
+            var imagePath = Path.Combine(webRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+            _unitOfWork.Products.Remove(objFromDb);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successful" });
         }
 
         #region API CALLS
@@ -136,45 +160,13 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var allObj = _productRepository.GetProducts();
+            var allObj = _unitOfWork.Products.GetAll(includeProperties: "Category,CoverType");
             return Json(new { data = allObj });
         }
 
-        #endregion
-
-        #region Non-Action methods
-
-        [NonAction]
-        private IEnumerable<SelectListItem> GetSelectListItemsCategories(IEnumerable<Models.Category> elements)
-        {
-            var selectList = new List<SelectListItem>();
-            foreach (var element in elements)
-            {
-                selectList.Add(new SelectListItem
-                {
-                    Value = element.Id.ToString(),
-                    Text = element.Name
-                });
-            }
-            return selectList;
-        }
-
-        [NonAction]
-        private IEnumerable<SelectListItem> GetSelectListItemsCoverTypes(IEnumerable<Models.CoverType> elements)
-        {
-            var selectList = new List<SelectListItem>();
-            foreach (var element in elements)
-            {
-                selectList.Add(new SelectListItem
-                {
-                    Value = element.Id.ToString(),
-                    Text = element.Name
-                });
-            }
-            return selectList;
-        }
 
         #endregion
+
 
     }
 }

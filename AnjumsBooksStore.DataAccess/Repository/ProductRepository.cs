@@ -22,49 +22,25 @@ namespace AnjumsBooksStore.DataAccess.Repository
 
         public void Update(Product product)
         {
-            //use.NET LINQ to retrieve the first or default category objects,
-            //then pass the id as a generic entity which matches the category ID
-
             var objFromDb = _db.Products.FirstOrDefault(s => s.Id == product.Id);
-            if (objFromDb != null) // save changer if not null
+            if (objFromDb != null)
             {
-                if (objFromDb.ImageUrl != null)
+                if (product.ImageUrl != null)
                 {
                     objFromDb.ImageUrl = product.ImageUrl;
                 }
+
                 objFromDb.Title = product.Title;
                 objFromDb.Description = product.Description;
                 objFromDb.ISBN = product.ISBN;
                 objFromDb.Author = product.Author;
-                objFromDb.LastPrice = product.LastPrice;
+                objFromDb.ListPrice = product.ListPrice;
+                objFromDb.Price = product.Price;
+                objFromDb.Price50 = product.Price50;
+                objFromDb.Price100 = product.Price100;
                 objFromDb.CategoryId = product.CategoryId;
-                objFromDb.ImageUrl = product.ImageUrl;
                 objFromDb.CoverTypeId = product.CoverTypeId;
-                _db.SaveChanges();
             }
-        }
-
-        public IEnumerable<ProductVM> GetProducts()
-        {
-            var products = _db.Products.ToList();
-            var categories = _db.Categories.ToList();
-            var coverTypes = _db.CoverType.ToList();
-            List<ProductVM> productVMs = new List<ProductVM>();
-            ProductVM productVM = null;
-            foreach(var item in products)
-            {
-                productVM = new ProductVM();
-                productVM.Id = item.Id;
-                productVM.Title = item.Title;
-                productVM.LastPrice = item.LastPrice;
-                productVM.ISBN = item.ISBN;
-                productVM.Author = item.Author;
-                productVM.CategoryName = categories.Where(i => i.Id == item.CategoryId).Select(i => i.Name).FirstOrDefault();
-                productVM.CoverTypeName = coverTypes.Where(i => i.Id == item.CoverTypeId).Select(i => i.Name).FirstOrDefault();
-
-                productVMs.Add(productVM);
-            }
-            return productVMs;
         }
     }
 }
