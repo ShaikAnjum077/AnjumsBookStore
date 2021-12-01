@@ -13,3 +13,5 @@ Added migrations for class model
 Added dependency injection for ICategoryRepository
 applied CURD operations for class.
 			
+20th November 10AM adding new class to themodels project and making sure that it is public in order to avoid all the errors.
+References been added
