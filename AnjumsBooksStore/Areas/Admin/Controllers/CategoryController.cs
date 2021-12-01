@@ -13,70 +13,67 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ApplicationDbContext _db;
-        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryController(IUnitOfWork unitOfWork, ApplicationDbContext db, ICategoryRepository categoryRepository)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _db = db;
-            _categoryRepository = categoryRepository;
-        }
-
-
-        [HttpGet]
-        public IActionResult AddCategory()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult AddCategory(Category category)
-        {
-            if (ModelState.IsValid)
-            {
-                _db.Categories.Add(category);
-                _db.SaveChanges();
-            }
-            else
-                return View(category);
-            
-            return RedirectToAction("Index");
-        }
-
-
-        [HttpGet]
-        public IActionResult Upsert(int id)
-        {
-            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
-            return View(objFromDb);
-        }
-
-
-        [HttpPost]
-        public IActionResult Upsert(Category category)
-        {
-            if (ModelState.IsValid)
-                _categoryRepository.Update(category);
-            else
-                return View(category);
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            var objFromDb = _db.Categories.FirstOrDefault(s => s.Id == id);
-            _db.Categories.Remove(objFromDb);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         public IActionResult Index()
         {
             return View();
         }
+
+        public IActionResult Upsert(int? id)
+        {
+            Category category = new Category();
+            if (id == null)
+            {
+                // this is for create
+                return View(category);
+            }
+            // this is for edit
+            category = _unitOfWork.Category.Get(id.GetValueOrDefault());
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Upsert(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                if (category.Id == 0)
+                {
+                    _unitOfWork.Category.Add(category);
+                }
+                else
+                {
+                    _unitOfWork.Category.Update(category);
+                }
+                _unitOfWork.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            var objFromDb = _unitOfWork.Category.Get(id);
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _unitOfWork.Category.Remove(objFromDb);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successful" });
+        }
+
 
         #region API CALLS
         [HttpGet]

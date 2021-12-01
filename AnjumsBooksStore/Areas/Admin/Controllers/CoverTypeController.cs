@@ -13,69 +13,66 @@ namespace AnjumsBooksStore.Areas.Admin.Controllers
     public class CoverTypeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ApplicationDbContext _db;
-        private readonly ICoverTypeRepository _coverTypeRepository;
 
-        public CoverTypeController(IUnitOfWork unitOfWork, ApplicationDbContext db, ICoverTypeRepository coverTypeRepository)
+        public CoverTypeController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _db = db;
-            _coverTypeRepository = coverTypeRepository;
-        }
-
-
-        [HttpGet]
-        public IActionResult AddCoverType()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult AddCoverType(CoverType coverType)
-        {
-            if (ModelState.IsValid)
-            {
-                _db.CoverType.Add(coverType);
-                _db.SaveChanges();
-            }
-            else
-                return View(coverType);
-
-            return RedirectToAction("Index");
-        }
-
-
-        [HttpGet]
-        public IActionResult Upsert(int id)
-        {
-            var objFromDb = _db.CoverType.FirstOrDefault(s => s.Id == id);
-            return View(objFromDb);
-        }
-
-
-        [HttpPost]
-        public IActionResult Upsert(CoverType coverType)
-        {
-            if (ModelState.IsValid)
-                _coverTypeRepository.Update(coverType);
-            else
-                return View(coverType);
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            var objFromDb = _db.CoverType.FirstOrDefault(s => s.Id == id);
-            _db.CoverType.Remove(objFromDb);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Upsert(int? id)
+        {
+            CoverType category = new CoverType();
+            if (id == null)
+            {
+                // this is for create
+                return View(category);
+            }
+            // this is for edit
+            category = _unitOfWork.CoverType.Get(id.GetValueOrDefault());
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Upsert(CoverType coverType)
+        {
+            if (ModelState.IsValid)
+            {
+                if (coverType.Id == 0)
+                {
+                    _unitOfWork.CoverType.Add(coverType);
+                }
+                else
+                {
+                    _unitOfWork.CoverType.Update(coverType);
+                }
+                _unitOfWork.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(coverType);
+        }
+
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            var objFromDb = _unitOfWork.CoverType.Get(id);
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _unitOfWork.CoverType.Remove(objFromDb);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successful" });
         }
 
         #region API CALLS
