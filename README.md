@@ -44,6 +44,11 @@ Same day 4:30PM created the tiny cloud account with the college Address and copi
 
 2021.12/6 5AM: Final day to submit the project checking if there are any more errors or its working fine. 
 
+2021/12/7 5AM: Upexteced errors occured trying to resolve and then as per the final output there shouldn't price of list of bulk so removed them and then committed again. 
+
+2021/12/8 10AM: Made all the changes but couldn't insert the image to home icon. Resolved all the errors.
+
+2021/12/9 11AM: Made the necessary changes and pushed to github.
 
 
 
